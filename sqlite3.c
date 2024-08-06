@@ -59,8 +59,8 @@ void sqlite3_add(sqlite3 *ppDb, char *table_name)
     memset(name, 0, 32);
     printf("请输入id, 姓名， 年龄\n");
     scanf("%d%s%d", &id, name, &age);
-    while (getchar() != '\n')
-        ;
+    getchar();
+
     memset(sql, 0, 128);
     sprintf(sql, "insert into %s values (%d,'%s',%d);", table_name, id, name, age);
     int ret = sqlite3_exec(ppDb, sql, NULL, NULL, NULL); // 第三个参数回调函数暂时不需要
@@ -78,8 +78,7 @@ void sqlite3_delete(sqlite3 *ppDb, char *table_name)
     char sql[128] = {0};
     printf("请输入你要删除的id\n");
     scanf("%d", &id);
-    while (getchar() != '\n')
-        ;
+    getchar();
     memset(sql, 0, 128);
     sprintf(sql, "delete from %s where id = %d;", table_name, id);
     int ret = sqlite3_exec(ppDb, sql, NULL, NULL, NULL); // 第三个参数回调函数暂时不需要
@@ -97,31 +96,29 @@ void sqlite3_change(sqlite3 *ppDb, char *table_name)
     char name[32] = {0};
     char sql[128] = {0};
     printf("请输入你要修改的id\n");
-    while (getchar() != '\n')
-        ;
+    getchar();
     scanf("%d", &id);
     printf("请选择你要修改的数据：1.姓名|2.年龄\n");
-    scanf("%n", &n);
-    while (getchar() != '\n')
-        ;
+    scanf("%d", &n);
+    getchar();
     if (n == 1)
     {
         printf("请输入你要修改的名字\n");
         scanf("%s", name);
-        while (getchar() != '\n')
-            ;
+        getchar();
         memset(sql, 0, 128);
-        sprintf(sql, "update %s set name = %s wher id = %d;", table_name, name, id);
+        sprintf(sql, "update %s set name = '%s' wher id = %d;", table_name, name, id);
+        printf("%s\n", sql);
         sqlite3_exec(ppDb, sql, NULL, NULL, NULL);
     }
     else if (n == 2)
     {
         printf("请输入你要修改的年龄\n");
         scanf("%d", &age);
-        while (getchar() != '\n')
-            ;
+        getchar();
         memset(sql, 0, 128);
         sprintf(sql, "update %s set age = %d wher id = %d;", table_name, age, id);
+        printf("%s\n", sql);
         sqlite3_exec(ppDb, sql, NULL, NULL, NULL);
     }
     else
@@ -131,21 +128,18 @@ void sqlite3_change(sqlite3 *ppDb, char *table_name)
     return;
 }
 
+// 回调函数
+void print(void)
+{
+    
+}
+
 // 数据库查看表总数据
 void sqlite3_show(sqlite3 *ppDb, char *table_name)
 {
-    // char sql[128] = {0};
-    // memset(sql, 0, 128);
-    // sprintf(sql, ".header on");
-    // sqlite3_exec(ppDb, sql, NULL, NULL, NULL);
-
-    // memset(sql, 0, 128);
-    // sprintf(sql, ".mode column");
-    // sqlite3_exec(ppDb, sql, NULL, NULL, NULL);
-
-    // memset(sql, 0, 128);
-    // sprintf(sql, "select *from %s;", table_name);
-    // sqlite3_exec(ppDb, sql, NULL, NULL, NULL); // 第三个参数回调函数暂时不需要
+    memset(sql, 0, 128);
+    sprintf(sql, "select *from %s;", table_name);
+    sqlite3_exec(ppDb, sql, print, NULL, NULL);
 }
 
 int main(int argc, char const *argv[])
@@ -164,7 +158,7 @@ int main(int argc, char const *argv[])
         switch (ret)
         {
         case 1:
-            sqlite3_add(ppDb, "student"); // 增
+            sqlite3_add(ppDb, "student"); // 增   数据库句柄  和表的名字
             break;
         case 2:
             sqlite3_delete(ppDb, "student"); // 以id为删除标志
@@ -178,7 +172,18 @@ int main(int argc, char const *argv[])
         case 0:
             break;
         }
+        if (ret == 0)
+            break;
     }
 
     return 0;
 }
+
+// char sql[128] = {0};
+// memset(sql, 0, 128);
+// sprintf(sql, ".header on");
+// sqlite3_exec(ppDb, sql, NULL, NULL, NULL);
+
+// memset(sql, 0, 128);
+// sprintf(sql, ".mode column");
+// sqlite3_exec(ppDb, sql, NULL, NULL, NULL);
